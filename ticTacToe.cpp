@@ -20,13 +20,14 @@ int checkWinner(int board[][3]);
 void displayBoard(int board[][3]);
 bool isMoveValid(int board[][3], int row, int col);
 bool isBoardFull(int board[][3]);
-void minimax(int board[][3], int depth, bool maximizingPlayer);
+int minimax(int board[][3], int depth, bool maximizingPlayer);
 void export_board(int board[][3], int turn);
 void clearTextFile(string fileName);
 int board_score_plus(int board[BOARD_SIZE][BOARD_SIZE]);
 int board_score(int board[BOARD_SIZE][BOARD_SIZE]);
 
 int board[3][3] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+int arr[2];
 
 int main()
 {
@@ -46,10 +47,15 @@ int main()
         else
         {
             clearTextFile("board.txt");
-            minimax(board, 7, false);
-            int row, col;
-            cin >> row >> col;
-            makeMove(board, currentPlayer, row, col);
+            if (board[1][1] == EMPTY)
+            {
+                makeMove(board, O, 1, 1);
+            }
+            else
+            {
+                minimax(board, 2, false);
+                makeMove(board, currentPlayer, arr[0], arr[1]);
+            }
         }
 
         if (checkWinner(board) != 0)
@@ -156,33 +162,57 @@ bool isBoardFull(int board[][3])
     return true;
 }
 
-void minimax(int board[][3], int depth, bool maximizingPlayer)
+int minimax(int board[][3], int depth, bool maximizingPlayer)
 {
     if (depth == 0)
     {
-        return;
+        return board_score(board);
     }
+
+    int maxScore = -999999;
+    int minScore = 999999;
 
     for (int i = 0; i < 3; i++)
     {
         for (int j = 0; j < 3; j++)
         {
             int player = maximizingPlayer ? 1 : -1;
-            if (board[i][j] == EMPTY && maximizingPlayer)
+            if (board[i][j] == EMPTY)
             {
                 makeMove(board, player, i, j);
                 export_board(board, player);
-                minimax(board, depth - 1, false);
-                removeMove(board, i, j);
-            }
-            else if (board[i][j] == EMPTY && !maximizingPlayer)
-            {
-                makeMove(board, player, i, j);
-                export_board(board, player);
-                minimax(board, depth - 1, true);
-                removeMove(board, i, j);
+
+                if (maximizingPlayer)
+                {
+                    int score = minimax(board, depth - 1, false);
+                    if (score > maxScore)
+                    {
+                        maxScore = score;
+                    }
+                    removeMove(board, i, j);
+                }
+                else
+                {
+                    int score = minimax(board, depth - 1, true);
+                    if (score < minScore)
+                    {
+                        minScore = score;
+                        arr[0] = i;
+                        arr[1] = j;
+                    }
+                    removeMove(board, i, j);
+                }
             }
         }
+    }
+
+    if (maximizingPlayer)
+    {
+        return maxScore;
+    }
+    else
+    {
+        return minScore;
     }
 }
 
