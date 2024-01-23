@@ -21,18 +21,18 @@ void displayBoard(int board[][3]);
 bool isMoveValid(int board[][3], int row, int col);
 bool isBoardFull(int board[][3]);
 int minimax(int board[][3], int depth, bool maximizingPlayer);
-void export_board(int board[][3], int turn);
+void export_board(int board[][3], int turn, int i, int j);
 void clearTextFile(string fileName);
 int board_score_plus(int board[BOARD_SIZE][BOARD_SIZE]);
 int board_score(int board[BOARD_SIZE][BOARD_SIZE]);
 
-int board[3][3] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+int board[3][3] = {{1, 0, 0}, {-1, -1, 0}, {1, 0, 1}};
 int arr[2];
 
 int main()
 {
 
-    int currentPlayer = 1;
+    int currentPlayer = -1;
 
     while (true)
     {
@@ -53,7 +53,10 @@ int main()
             }
             else
             {
-                minimax(board, 2, false);
+                cout << endl
+                     << minimax(board, 4, false);
+                int a;
+                cin >> a;
                 makeMove(board, currentPlayer, arr[0], arr[1]);
             }
         }
@@ -111,7 +114,14 @@ void displayBoard(int board[][3])
 
 void makeMove(int board[][3], int player, int row, int col)
 {
-    board[row][col] = player;
+    if (board[row][col] == EMPTY)
+    {
+        board[row][col] = player;
+    }
+    else
+    {
+        cout << "eroorrrrrrrr";
+    }
 }
 void removeMove(int board[][3], int row, int col)
 {
@@ -164,9 +174,9 @@ bool isBoardFull(int board[][3])
 
 int minimax(int board[][3], int depth, bool maximizingPlayer)
 {
-    if (depth == 0)
+    if (depth == 0 || checkWinner(board) != 0 || isBoardFull(board))
     {
-        return board_score(board);
+        return board_score(board) + board_score_plus(board);
     }
 
     int maxScore = -999999;
@@ -180,7 +190,7 @@ int minimax(int board[][3], int depth, bool maximizingPlayer)
             if (board[i][j] == EMPTY)
             {
                 makeMove(board, player, i, j);
-                export_board(board, player);
+                export_board(board, player, i, j);
 
                 if (maximizingPlayer)
                 {
@@ -188,6 +198,8 @@ int minimax(int board[][3], int depth, bool maximizingPlayer)
                     if (score > maxScore)
                     {
                         maxScore = score;
+                        arr[0] = i;
+                        arr[1] = j;
                     }
                     removeMove(board, i, j);
                 }
@@ -216,7 +228,7 @@ int minimax(int board[][3], int depth, bool maximizingPlayer)
     }
 }
 
-void export_board(int board[][3], int turn)
+void export_board(int board[][3], int turn, int i, int j)
 {
     fstream file;
     file.open("board.txt", ios::app);
@@ -253,6 +265,8 @@ void export_board(int board[][3], int turn)
 
         file << "board score : " << board_score(board) << endl;
         file << "board score plus: " << board_score_plus(board) << endl;
+        file << "final score : " << board_score_plus(board) + board_score(board) << endl;
+        file << "final score : " << i << " " << j;
         file << endl;
 
         file

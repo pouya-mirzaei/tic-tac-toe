@@ -1,9 +1,40 @@
 O's choose : 
-O X O 
-O X O 
-X O X 
-board score : -6
-board score plus: 0
+X O - 
+O O - 
+X - X 
+board score : 1
+board score plus: -14
+final score : -13
+final score : 0 1
+--------------------------------------------------------------
 
+X's choose : 
+X O X 
+O O - 
+X - X 
+board score : 10
+board score plus: 0
+final score : 10
+final score : 0 2
+--------------------------------------------------------------
+
+O's choose : 
+X O X 
+O O O 
+X - X 
+board score : -98
+board score plus: 0
+final score : -98
+final score : 1 2
+--------------------------------------------------------------
+
+O's choose : 
+X O X 
+O O - 
+X O X 
+board score : -98
+board score plus: 0
+final score : -98
+final score : 2 1
 --------------------------------------------------------------
 
