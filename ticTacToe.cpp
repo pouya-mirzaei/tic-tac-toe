@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <windows.h>
 using namespace std;
 
 #define X 1
@@ -11,6 +12,8 @@ using namespace std;
 #define MIDDLE_HOME 8
 #define NEAR_HOME 14
 #define BIG_BOARD_VALUE 3
+
+#define DEFAULT_DEPTH 4
 
 #define BOARD_SIZE 3
 
@@ -26,13 +29,15 @@ void clearTextFile(string fileName);
 int board_score_plus(int board[BOARD_SIZE][BOARD_SIZE]);
 int board_score(int board[BOARD_SIZE][BOARD_SIZE]);
 
-int board[3][3] = {{1, 0, 0}, {-1, -1, 0}, {1, 0, 1}};
+int board[3][3] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
 int arr[2];
 
+int arr2[9] = {-1, -1, -1, -1, -1, -1, -1, -1, -1};
+int count = 0;
 int main()
 {
 
-    int currentPlayer = -1;
+    int currentPlayer = X;
 
     while (true)
     {
@@ -53,10 +58,12 @@ int main()
             }
             else
             {
-                cout << endl
-                     << minimax(board, 4, false);
-                int a;
-                cin >> a;
+
+                int a = minimax(board, DEFAULT_DEPTH, false);
+
+                cout << a;
+                int test;
+                cin >> test;
                 makeMove(board, currentPlayer, arr[0], arr[1]);
             }
         }
@@ -114,14 +121,7 @@ void displayBoard(int board[][3])
 
 void makeMove(int board[][3], int player, int row, int col)
 {
-    if (board[row][col] == EMPTY)
-    {
-        board[row][col] = player;
-    }
-    else
-    {
-        cout << "eroorrrrrrrr";
-    }
+    board[row][col] = player;
 }
 void removeMove(int board[][3], int row, int col)
 {
@@ -174,13 +174,14 @@ bool isBoardFull(int board[][3])
 
 int minimax(int board[][3], int depth, bool maximizingPlayer)
 {
-    if (depth == 0 || checkWinner(board) != 0 || isBoardFull(board))
+    if (depth == 0)
     {
         return board_score(board) + board_score_plus(board);
     }
 
-    int maxScore = -999999;
-    int minScore = 999999;
+    int maxScore = -99999999;
+
+    int minScore = 99999999;
 
     for (int i = 0; i < 3; i++)
     {
@@ -195,20 +196,29 @@ int minimax(int board[][3], int depth, bool maximizingPlayer)
                 if (maximizingPlayer)
                 {
                     int score = minimax(board, depth - 1, false);
-                    if (score > maxScore)
+                    if (score >= maxScore)
                     {
                         maxScore = score;
-                        arr[0] = i;
-                        arr[1] = j;
+                        if (depth == DEFAULT_DEPTH - 1)
+                        {
+                            // arr2[count] = 3 * i + j;
+                            // count++;
+                        }
                     }
                     removeMove(board, i, j);
                 }
                 else
                 {
                     int score = minimax(board, depth - 1, true);
-                    if (score < minScore)
+                    if (score <= minScore)
                     {
                         minScore = score;
+                        if (depth == DEFAULT_DEPTH - 1)
+                        {
+                            arr2[count] = 3 * i + j;
+                            count++;
+                        }
+
                         arr[0] = i;
                         arr[1] = j;
                     }
@@ -263,10 +273,10 @@ void export_board(int board[][3], int turn, int i, int j)
             file << endl;
         }
 
-        file << "board score : " << board_score(board) << endl;
+        file << "\nboard score : " << board_score(board) << endl;
         file << "board score plus: " << board_score_plus(board) << endl;
-        file << "final score : " << board_score_plus(board) + board_score(board) << endl;
-        file << "final score : " << i << " " << j;
+        file << "final score : " << (board_score(board) + board_score_plus(board)) << endl;
+        file << "coordination : " << i << " " << j << endl;
         file << endl;
 
         file
@@ -310,7 +320,7 @@ int board_score(int board[BOARD_SIZE][BOARD_SIZE])
         }
     }
 
-    sum += checkWinner(board) * 100;
+    sum += checkWinner(board) * 50;
 
     return sum;
 }
